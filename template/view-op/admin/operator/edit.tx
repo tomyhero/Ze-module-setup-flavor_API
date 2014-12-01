@@ -1,0 +1,12 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operator_list' } %]
+
+<div>
+operator > edit
+</div>
+
+<form method="post" action="/admin/operator/[% obj.id %]/edit">
+[% INCLUDE 'admin/operator/form.inc' WITH mode = 'edit' %]
+</form>
+
+
+[% INCLUDE 'footer.inc' %]

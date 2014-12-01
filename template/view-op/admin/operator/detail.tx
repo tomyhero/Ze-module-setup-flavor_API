@@ -1,0 +1,42 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operator_list' } %]
+
+<div>
+operator > detail
+</div>
+
+<table class="detail">
+    <tr>
+      <th>operator id</th>
+       <td>[% obj.id %]</td>
+    </tr>
+    <tr>
+      <th>Email</th>
+       <td>[% obj.email %]</td>
+    </tr>
+    <tr>
+      <th>Name</th>
+       <td>[% obj.op_name %]</td>
+    </tr>
+    <tr>
+      <th>timezone</th>
+       <td>[% obj.op_timezone %]</td>
+    </tr>
+    <tr>
+      <th>language</th>
+       <td>[% obj.op_language %]</td>
+    </tr>
+    <tr>
+      <th>active</th>
+       <td>[% obj.on_active %]</td>
+    </tr>
+    <tr>
+      <th>access control</th>
+      <td>[% FOREACH access_key IN obj.access_keys() ; access_key ; END %]</td>
+    </tr>
+    <tr>
+      <th>created_at</th>
+       <td>[% obj.to_localized_datetime('created_at',operator_obj.op_timezone).fmt_datetime %]</td>
+    </tr>
+</table>
+
+[% INCLUDE 'footer.inc' %]

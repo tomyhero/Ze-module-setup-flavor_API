@@ -1,0 +1,33 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'my', sub_menu => 'operator_edit' } %]
+
+
+<form method="post" action="/my/operator/edit">
+<table class="form">
+    <tr>
+      <th>Email</th>
+       <td>[% operator_obj.email %]</td>
+    </tr>
+    <tr>
+      <th>Name</th>
+       <td><input type="text" name="op_name" value=""></td>
+    </tr>
+    <tr>
+      <th>timezone</th>
+       <td>
+       [% INCLUDE 'lookup/op_timezone.inc' %]
+       </td>
+    </tr>
+    <tr>
+      <th>language</th>
+       <td>
+       [% INCLUDE 'lookup/op_language.inc' %]
+        </td>
+    </tr>
+    <tr>
+      <td align="right" colspan="2"><input type="submit" value="Edit" /></td>
+    </tr>
+</table>
+</form>
+
+
+[% INCLUDE 'footer.inc' %]

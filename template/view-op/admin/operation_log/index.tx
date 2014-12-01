@@ -1,0 +1,67 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operation_log_list' } %]
+
+<form method="get" action="/admin/operation_log/">
+<table class="search">
+
+
+<tr>
+<th>operation log id</th>
+<td><input type="text" name="operation_log_id" /></td>
+</tr>
+
+<tr>
+<th>operator id</th>
+<td><input type="text" name="operator_id" /></td>
+</tr>
+
+<tr>
+<th>opeartion type</th>
+<td>
+[% INCLUDE 'lookup/operation_log.inc' WITH on_empty = 1 %]
+</td>
+</tr>
+
+      <tr>
+        <th>sort</th>
+        <td>
+          <select name="sort">
+            <option value="operation_log_id">operation_log_id</option>
+          </select>
+            <select name="direction">
+                <option value="descend">descend</option>
+                <option value="ascend">ascend</option>
+            </select>
+        </td>
+      </tr>
+
+
+
+<tr>
+<td colspan="2"><input type="submit" value="Search" /></td>
+</tr>
+</table>
+</form>
+
+<table class="listing">
+<tr>
+  <th>operation log id</th>
+  <th>operator</th>
+  <th>operator_type</th>
+  <th>attributes</th>
+  <th>&nbsp;</th>
+</tr>
+[% SET lookup_operation_type = lookup_const('operation_type') %]
+[% FOREACH obj IN objs %]
+<tr>
+  <td>[% obj.id %]</td>
+  <td> <a href="/admin/operator/[% obj.operator_id %]/">[% obj.operator_id %]</a> : [% obj.operator_obj.op_name %]</td>
+  <td>[% obj.operation_type %] : [% lookup_operation_type.${obj.operation_type} %]</td>
+  <td>[% obj.attributes_dump %]</td>
+  <td><a href="/admin/operation_log/[% obj.id %]/">detail</a></td>
+</tr>
+[% END %]
+</table>
+
+[% paginate(pager,c.req.uri ) %]
+
+[% INCLUDE 'footer.inc'  %]

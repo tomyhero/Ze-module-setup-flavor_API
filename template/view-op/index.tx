@@ -1,0 +1,3 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'top', sub_menu => 'top' } %]
+top
+[% INCLUDE 'footer.inc' %]

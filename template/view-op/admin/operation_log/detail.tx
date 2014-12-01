@@ -1,0 +1,35 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operation_log_list' } %]
+
+<table class="detail">
+    <tr>
+      <th>operation log id</th>
+       <td>[% obj.id %]</td>
+    </tr>
+    <tr>
+      <th>operator</th>
+       <td><a href="/admin/operator/[% obj.operator_id %]/">[% obj.operator_id %]</a> : [% obj.operator_obj.op_name %]</td>
+    </tr>
+    <tr>
+      [% SET lookup_operation_type = lookup_const('operation_type') %]
+      <th>operation type</th>
+       <td>[% obj.operation_type %] : [% lookup_operation_type.${ obj.operation_type } %]</td>
+    </tr>
+    <tr>
+      <th>criteria code</th>
+      <td>[% obj.criteria_code %]</td>
+    </tr>
+    <tr>
+      <th>attricute dump</th>
+      <td>[% obj.attributes_dump %]</td>
+    </tr>
+    <tr>
+      <th>operation memo</th>
+      <td>[% obj.operation_memo %]</td>
+    </tr>
+    <tr>
+      <th>created_at</th>
+       <td>[% obj.to_localized_datetime('created_at',operator_obj.op_timezone).fmt_datetime %]</td>
+    </tr>
+</table>
+
+[% INCLUDE 'footer.inc' %]

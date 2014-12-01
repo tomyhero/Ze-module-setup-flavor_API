@@ -1,0 +1,30 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'my', sub_menu => 'operator' } %]
+
+
+<table class="detail">
+    <tr>
+      <th>Email</th>
+       <td>[% operator_obj.email %]</td>
+    </tr>
+    <tr>
+      <th>Name</th>
+       <td>[% operator_obj.op_name %]</td>
+    </tr>
+    <tr>
+      <th>timezone</th>
+       <td>[% operator_obj.op_timezone %]</td>
+    </tr>
+    <tr>
+      <th>language</th>
+       <td>[% operator_obj.op_language %]</td>
+    </tr>
+    <tr>
+      <th>Access Control</th>
+       <td>
+          [% FOREACH k IN operator_obj.access_keys() ; k ; END %]
+       </td>
+    </tr>
+</table>
+
+
+[% INCLUDE 'footer.inc' %]

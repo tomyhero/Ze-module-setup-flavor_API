@@ -1,0 +1,6 @@
+msgid ""
+msgstr ""
+
+#: view-include/op/header.inc:15
+msgid "Operation System"
+msgstr "運用システム"

@@ -1,0 +1,72 @@
+[% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operator_list' } %]
+
+<form method="get" action="/admin/operator/">
+<table class="search">
+<tr>
+<th>operator id</th>
+<td><input type="text" name="operator_id" /></td>
+</tr>
+<tr>
+<th>active</th>
+<td>
+[% INCLUDE 'lookup/on_active.inc' WITH on_empty = 1 %]
+</td>
+</tr>
+
+</tr>
+      <tr>
+        <th>sort</th>
+        <td>
+          <select name="sort">
+            <option value="operator_id">operator id</option>
+          </select>
+            <select name="direction">
+                <option value="descend">descend</option>
+                <option value="ascend">ascend</option>
+            </select>
+        </td>
+      </tr>
+
+
+<tr>
+<td colspan="2"><input type="submit" value="Search" /></td>
+</tr>
+</table>
+</form>
+
+<table class="listing">
+<tr>
+  <th>id</th>
+  <th>name</th>
+  <th>email</th>
+  <th>language</th>
+  <th>timezone</th>
+  <th>access_keys</th>
+  <th>on_active</th>
+  <th>&nbsp;</th>
+</tr>
+[% FOREACH obj IN objs %]
+<tr>
+  <td>[% obj.id %]</td>
+  <td>[% obj.op_name %]</td>
+  <td>[% obj.email %]</td>
+  <td>[% obj.op_language %]</td>
+  <td>[% obj.op_timezone %]</td>
+  <td>
+  [% FOREACH access_key IN obj.access_keys() %]
+    [% access_key %]
+  [% END %]
+  </td>
+  <td>[% obj.on_active %]
+  <td>
+  <a href="/admin/operator/[% obj.id %]/">detail</a>/
+  <a href="/admin/operator/[% obj.id %]/edit">edit</a>/
+  <a href="/admin/operation_log/?operator_id=[% obj.id %]">oprator log</a>
+</td>
+</tr>
+[% END %]
+</table>
+
+[% paginate(pager,c.req.uri ) %]
+
+[% INCLUDE 'footer.inc'  %]
