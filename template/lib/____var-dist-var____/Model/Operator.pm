@@ -59,7 +59,7 @@ sub create_admin_operator {
     my ($self, $args) = @_;
     my $v = $self->assert_with($args);
 
-    $self->data_class->single({ email => $v->{email} }) and $self->abort_with("alreaady_registered");
+    $self->data_class->single({ email => $v->{email} }) and $self->abort_with("already_registered");
 
     my $acl = <+ dist +>::OP::ACL->new();
     my $obj = $self->data_class->new(
@@ -74,7 +74,7 @@ sub create_admin_operator {
 
 sub create_from_op {
     my ($self, $args,$operator_obj) = @_;
-    $self->abort_with("you must be admin") unless $operator_obj->has_privilege(OP_ACL_ADMIN);
+    $self->abort_with("you_must_be_admin") unless $operator_obj->has_privilege(OP_ACL_ADMIN);
 
     my $v = $self->assert_with($args);
     my $operation_memo = delete $v->{operation_memo};
@@ -120,7 +120,7 @@ sub update_from_op_for_operator {
 
 sub update_from_op {
     my ($self,$obj,$args,$operator_obj) = @_;
-    $self->abort_with("you must be admin") unless $operator_obj->has_privilege(OP_ACL_ADMIN);
+    $self->abort_with("you_must_be_admin") unless $operator_obj->has_privilege(OP_ACL_ADMIN);
     my $v = $self->assert_with($args);
 
     my $acl = <+ dist +>::OP::ACL->new(); 
