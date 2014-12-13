@@ -108,6 +108,1404 @@ template: "sp name [% name %]\n"
 file: view-component/pc/sample/echo.tx
 template: "pc name [% name %]\n"
 ---
+file: view-explorer/index.tx
+template: |
+  [% INCLUDE 'header.inc' %]
+  
+  
+  <table>
+  <tr>
+  <td valign="top">
+  <form method="post" id="form" onsubmit="return do_exproler();">
+    <table class="form">
+      <tr>
+        <th>Access Token:</th>
+        <td><input type="text" name="access_token" id="access_token" value="" /></td>
+      </tr>
+      <tr>
+        <th>Internal Token:</th>
+        <td><input type="text" name="internal_token" id="internal_token" value="" /></td>
+      </tr>
+      <tr>
+        <th>Path</th>
+        <td>
+          <input type="text" name="path" value="/app/info" id="path" />
+        </td>
+      </tr>
+      <tr>
+        <th>Args in JSON</th>
+        <td>
+          <textarea name="args" id="args"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:right">
+          <input type="submit" value="実行" />
+        </td>
+      </tr>
+  
+  </table>
+  </form>
+  
+  <table class="form">
+    <tr><td><textarea id="response" name="response" style="width:500px;height:400px"></textarea></td></tr>
+  </table>
+  
+  </td>
+  <td valign="top">
+  
+  <div class="m_info-container" style="width:400px;">
+  <div id="doc_detail"></div>
+  
+  
+  <ul>
+  [% FOREACH group IN doc %]
+  <li>[% group.name %]</li>
+  <ul>
+    [% FOREACH item IN group.items %]
+      <li>
+      <a class="api_path" data-api_path="[% item.path %]" href="#">[% item.path %]</a>
+  </li>
+    [% END %]
+  </ul>
+  [% END %]
+  </ul>
+  
+  </div>
+  
+  </td>
+  </tr>
+  </table>
+  
+  
+  
+  
+  [% MACRO footer_content_block  BLOCK -%]
+  <script>
+  
+  set_api('/app/info');
+  function set_api(path){
+      $('#path').val( path );
+  
+      $.ajax({ 
+        url: '/explorer/doc',
+        data: { path :path},
+        success: function(json){
+          $('#doc_detail').html(  $('#tmpl_doc_detail').template(json.item) );
+          var args = {};
+          for (var field in json.item.requests){
+            args[field] = '';
+          }
+          $('#args').val(JSON.stringify(args, undefined, 2));
+        }
+      });
+  
+  }
+  $(document).ready(function() {
+    $('.api_path').click(function(){
+      var path = $(this).attr('data-api_path');
+      set_api(path);
+    });
+  
+    return false;
+  
+  });
+  
+  function do_exproler(){
+    $('#response').val('Loading...');
+  
+  
+  
+    $.ajax({ 
+      url: '/explorer/proxy',
+      dataType: "JSON",
+      data: $('#form').serialize(),
+      success: function(json){
+        $('#response').val(JSON.stringify(json, undefined, 2) );
+      }
+    });
+    return false;
+  }
+  
+  </script>
+  [% END %]
+  
+  <script id="tmpl_doc_detail" type="text/html">
+    <table>
+      <tr>
+        <th>path</th>
+        <td><%= path %></td>
+      </tr>
+      <tr>
+        <th>description</th>
+        <td><%= description %></td>
+      </tr>
+      <tr><th colspan="2">Requests</td></tr>
+      <%  for (var field in requests) { %>
+      <tr>
+        <th><%= field %></th>
+        <td><%= requests[field] %></td>
+      </tr>
+      <% } %>
+      <tr><th colspan="2">Response</td></tr>
+      <%  for (var field in response) { %>
+      <tr>
+        <th><%= field %></th>
+        <td><%= response[field] %></td>
+      </tr>
+      <% } %>
+      <tr><th colspan="2">Custom Errors</td></tr>
+      <%  for (var field in custom_errors ) { %>
+      <tr>
+        <th><%= field %></th>
+        <td><%= custom_errors[field] %></td>
+      </tr>
+      <% } %>
+    </table>
+  </script>
+  
+  [% INCLUDE 'footer.inc' WITH
+      footer_content = footer_content_block()
+  %]
+---
+file: htdocs-explorer/static/css/base.css
+template: |+
+  m_info-container
+  html,
+  button,
+  input,
+  select,
+  textarea {
+      color: #222;
+  }
+  
+  html {
+      font-size: 1em;
+      line-height: 1.4;
+  }
+  
+  /*
+   *  * Remove text-shadow in selection highlight: h5bp.com/i
+   *   * These selection rule sets have to be separate.
+   *    * Customize the background color to match your design.
+   *     */
+  
+  ::-moz-selection {
+      background: #b3d4fc;
+      text-shadow: none;
+  }
+  
+  ::selection {
+      background: #b3d4fc;
+      text-shadow: none;
+  }
+  
+  /*
+   *  * A better looking default horizontal rule
+   *   */
+  
+  hr {
+      display: block;
+      height: 1px;
+      border: 0;
+      border-top: 1px solid #ccc;
+      margin: 1em 0;
+      padding: 0;
+  }
+  
+  /*
+   *  * Remove the gap between images, videos, audio and canvas and the bottom of
+   *   * their containers: h5bp.com/i/440
+   *    */
+  
+  audio,
+  canvas,
+  img,
+  video {
+      vertical-align: middle;
+  }
+  
+  /*
+   *  * Remove default fieldset styles.
+   *   */
+  
+  fieldset {
+      border: 0;
+      margin: 0;
+      padding: 0;
+  }
+  
+  /*
+   *  * Allow only vertical resizing of textareas.
+   *   */
+  
+  textarea {
+      resize: vertical;
+  }
+  
+  /* ==========================================================================
+   *    Browse Happy prompt
+   *       ========================================================================== */
+  
+  .browsehappy {
+      margin: 0.2em 0;
+      background: #ccc;
+      color: #000;
+      padding: 0.2em 0;
+  }
+  
+  /* ==========================================================================
+   *    Author's custom styles
+   *       ========================================================================== */
+  
+  body {
+      color: #333;
+      line-height: 1.4;
+      font-size: 14px;
+  }
+  
+  a {
+      color: #069;
+  }
+  a:link,
+  a:visited {
+      text-decoration: none;
+  }
+  a:hover,
+  a:active {
+      text-decoration: underline;
+  }
+  input[type="text"] { width:300}
+  textarea { width:300 ; height:100 }
+  input[type="submit"] {
+      padding: 4px 10px;
+      margin: 4px;
+      border-radius: 3px;
+      border: solid 1px #ccc;
+      background: #ddd;
+  }
+  input[type="submit"]:hover {
+      background: #eee;
+  }
+  
+  .login-bar {
+      border-bottom: solid 1px #e3e3e3;
+      padding: 1em;
+      text-align: right;
+      min-width: 900px;
+      font-size: 12px;
+  }
+  #menu_container {
+      border-bottom: solid 1px #e3e3e3;
+      font-size: 12px;
+      padding: 1em;
+      background: #EEE;
+      margin-bottom: 1em;
+      min-width: 900px;
+  }
+  ul#menu {
+      list-style: none;
+      margin: 0;
+      margin-bottom: 10px;
+      padding: 0 8px;
+  }
+  ul#menu li {
+      display: inline-block;
+  }
+  ul#menu li b {
+      display: inline-block;
+      padding: 4px;
+      background: #ddd;
+  }
+  ul#menu li a {
+      display: inline-block;
+      padding: 4px;
+  }
+  ul#sub_menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      width: 900px;
+  }
+  ul#sub_menu li {
+      display: inline-block;
+      width: 200px;
+      margin: 4px;
+      line-height: 1;
+  }
+  ul#sub_menu li b {
+      display: block;
+      width: 200px;
+      padding: 4px;
+  }
+  ul#sub_menu li a {
+      display: block;
+      padding: 4px;
+  }
+  ul#sub_menu li a:hover {
+      background: #ddd;
+      text-decoration: none;
+  }
+  
+  table.search {
+      border-collapse: separate;
+      border-spacing: 2px;
+      margin: 1em;
+  }
+  table.search input[type="text"] {
+      width: 400px;
+  }
+  .search th {
+      /* font-size : x-small ; */
+      background-color: #aceebe;
+      padding: 4px 10px;
+      text-align: right;
+  }
+  .search td {
+      /* font-size : x-small; */
+      padding: 4px 10px;
+  }
+  
+  
+  table.form {
+      border-collapse: separate;
+      border-spacing: 2px;
+      margin: 1em;
+  }
+  table.form input[type="text"] {
+      width: 400px;
+  }
+  table.form textarea {
+      width: 400px;
+      height: 100px;
+  }
+  table.form th {
+      /* font-size : x-small ; */
+      background-color: rgba(57.3%, 94.1%, 67.5%, 1.0);
+      padding: 4px 10px;
+      text-align: right;
+  }
+  table.form td {
+      /* font-size : x-small; */
+      padding: 4px 10px;
+  }
+  
+  
+  table.detail {
+      border-collapse: separate;
+      border-spacing: 2px;
+      margin: 1em;
+  }
+  table.detail th {
+      font-size: x-small;
+      background-color: rgba(65,131,196,0.4);
+      padding: 4px 10px;
+      text-align: right;
+      width: 200px;
+      border: solid 1px transparent;
+  }
+  table.detail td {
+      padding: 4px 10px;
+      font-size: 12px;
+      width: 400px;
+      border: solid 1px #eee;
+  }
+  
+  .detail-wrapper {
+      position: relative;
+      min-width: 700px;
+      padding: 0 10px;
+  }
+  .detail-sub-container {
+      position: absolute;
+      top: 0;
+      right: 10px;
+      width: 200px;
+  }
+  .detail-main-container {
+      margin-right: 220px;
+  }
+  ul.detail-nav {
+      font-size: 14px;
+      list-style: none;
+      margin: 0;
+      padding: 10px;
+      font-size: 20px;
+      margin-bottom: 10px;
+      background: #eee;
+      border: solid 1px #e3e3e3;
+      margin-right: 10px;
+  }
+  ul.detail-nav.type-l {
+      font-size: 14px;
+  }
+  ul.detail-nav.type-l li a:before {
+      content: "[ ";
+  }
+  ul.detail-nav.type-l li a:after {
+      content: " ]";
+  }
+  ul.detail-nav.type-s {
+      font-size: 12px;
+  }
+  ul.detail-nav li a {
+      display: block;
+      padding: 4px;
+  }
+  ul.detail-nav li a:hover {
+      background: #ddd;
+      text-decoration: none;
+  }
+  
+  
+  table.listing {
+      width: 100%;
+  }
+  table.listing tr:nth-child(even) {
+      background:#fff;
+  }
+  table.listing tr:nth-child(odd) {
+      background:#eee;
+  }
+  table.listing tr:hover {
+      background: #ffffcc;
+  }
+  .listing th {
+      font-size : x-small;
+      background-color: rgba(65,131,196,0.4);
+      padding: 10px 4px;
+      border-left: dotted 1px #ccc;
+  }
+  .listing td {
+      font-size : 11px;
+      padding: 8px;
+      border-left: dotted 1px #ccc;
+  }
+  .listing th.notice { background-color : #ff689a; }
+  .listing td.num { text-align : right;}
+  
+  
+  table th.operation_memo { background-color : #7cc0ff; }
+  
+  .pager {
+      padding: 1em;
+      text-align: center;
+      font-size: 12px;
+  }
+  .pager li {
+      display: inline-block;
+      margin: 4px;
+  }
+  .pager li:before {
+      content: " | ";
+  }
+  .pager li:first-child:before {
+      content: "";
+  }
+  .pager .input-mysize {
+      width: 4em;
+  }
+  
+  .copyright {
+      text-align: center;
+      font-size: 10px;
+      margin: 10em 0;
+      font-family: Helvetica, verdana;
+  }
+  
+  .sys-msg-finish {
+      margin: 0 1em;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px #ccc;
+      border: solid 2px #00CCA3;
+      display: inline-block;
+  }
+  .sys-msg-finish li {
+      padding-right: 4em;
+  }
+  
+  .bold {
+      font-weight: bold;
+  }
+  
+  
+  .m_info-container {
+      padding: 10px;
+      border: solid 1px #e5e5e5;
+      border-radius: 3px;
+      margin: 10px 0;
+      font-size: 11px;
+      color: #333;
+      box-shadow: 0 0 3px rgba(152,152,152,0.2);
+      font-family: Arial,sans-serif;
+  }
+  .m_info-container table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      width: 100%;
+      margin-bottom: 15px;
+      border: solid 1px #eee;
+  }
+  .m_info-container table th,
+  .m_info-container table td {
+      padding: 8px 8px;
+      border-bottom: solid 1px #e5e5e5;
+  }
+  .m_info-container table th {
+      text-align: left;
+      background: #fafafa;
+      border-right: solid 1px #e5e5e5;
+      color: #666;
+  }
+  .m_info-container table td {
+      vertical-align: top;
+  }
+  .m_info-container table thead th {
+      vertical-align: bottom;
+  }
+  .m_info-container table caption,
+  .m_info-container table tfoot {
+      font-size: 12px;
+      font-style: italic;
+  }
+  .m_info-container table caption {
+      text-align: left;
+      color: #999999;
+  }
+  
+  .m_info-container ul {
+      padding: 0;
+      list-style: none;
+  }
+  .m_info-container ul ul li  {
+      border-left: 3px solid #CACDD0;
+      margin-bottom: 3px;
+      padding-left: 10px;
+      -webkit-transition: all 0.3s ease;
+      -moz-transition: all 0.3s ease;
+      -o-transition: all 0.3s ease;
+      transition: all  0.3s ease;
+  }
+  .m_info-container ul ul li:hover  {
+      border-left: 3px solid #1FA2D6;
+      background: #fafafa;
+  }
+  .m_info-container ul ul li a {
+      display: block;
+  }
+  .m_info-container ul > li > :last-child {
+      margin-bottom: 0;
+  }
+  .m_info-container ul ul {
+      margin: 0;
+      padding-left: 20px;
+      list-style: none;
+      margin-bottom: 10px;
+  }
+  .m_info-container ul > li {
+      padding: 5px 5px;
+  }
+  
+  
+  
+  /* ==========================================================================
+   *    Helper classes
+   *       ========================================================================== */
+  
+  /*
+   *  * Image replacement
+   *   */
+  
+  .ir {
+      background-color: transparent;
+      border: 0;
+      overflow: hidden;
+      /* IE 6/7 fallback */
+                *text-indent: -9999px;
+            }
+  
+            .ir:before {
+                content: "";
+                display: block;
+                width: 0;
+                height: 150%;
+            }
+  
+            /*
+             *  * Hide from both screenreaders and browsers: h5bp.com/u
+             *   */
+  
+  .hidden {
+      display: none !important;
+      visibility: hidden;
+  }
+  
+  /*
+   *  * Hide only visually, but have it available for screenreaders: h5bp.com/v
+   *   */
+  
+  .visuallyhidden {
+      border: 0;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+  }
+  
+  /*
+   *  * Extends the .visuallyhidden class to allow the element to be focusable
+   *   * when navigated to via the keyboard: h5bp.com/p
+   *    */
+  
+  .visuallyhidden.focusable:active,
+  .visuallyhidden.focusable:focus {
+      clip: auto;
+      height: auto;
+      margin: 0;
+      overflow: visible;
+      position: static;
+      width: auto;
+  }
+  
+  /*
+   *  * Hide visually and from screenreaders, but maintain layout
+   *   */
+  
+  .invisible {
+      visibility: hidden;
+  }
+  
+  /*
+   *  * Clearfix: contain floats
+   *   *
+   *    * For modern browsers
+   *     * 1. The space content is one way to avoid an Opera bug when the
+   *      *    `contenteditable` attribute is included anywhere else in the document.
+   *       *    Otherwise it causes space to appear at the top and bottom of elements
+   *        *    that receive the `clearfix` class.
+   *         * 2. The use of `table` rather than `block` is only necessary if using
+   *          *    `:before` to contain the top-margins of child elements.
+   *           */
+  
+  .clearfix:before,
+  .clearfix:after {
+      content: " "; /* 1 */
+      display: table; /* 2 */
+  }
+  
+  .clearfix:after {
+      clear: both;
+  }
+  
+  /*
+   *  * For IE 6/7 only
+   *   * Include this rule to trigger hasLayout and contain floats.
+   *    */
+  
+  .clearfix {
+      *zoom: 1;
+  }
+  
+  /* ==========================================================================
+   *    EXAMPLE Media Queries for Responsive Design.
+   *       These examples override the primary ('mobile first') styles.
+   *          Modify as content requires.
+   *             ========================================================================== */
+  
+  @media only screen and (min-width: 35em) {
+      /* Style adjustments for viewports that meet the condition */
+  }
+  
+  @media print,
+  (-o-min-device-pixel-ratio: 5/4),
+  (-webkit-min-device-pixel-ratio: 1.25),
+  (min-resolution: 120dpi) {
+      /* Style adjustments for high resolution devices */
+  }
+  
+  /* ==========================================================================
+   *    Print styles.
+   *       Inlined to avoid required HTTP connection: h5bp.com/r
+   *          ========================================================================== */
+  
+  @media print {
+      * {
+          *     background: transparent !important;
+          *         color: #000 !important; /* Black prints faster: h5bp.com/s */
+          box-shadow: none !important;
+          text-shadow: none !important;
+      }
+  
+      a,
+      a:visited {
+          text-decoration: underline;
+      }
+  
+      a[href]:after {
+          content: " (" attr(href) ")";
+      }
+  
+      abbr[title]:after {
+          content: " (" attr(title) ")";
+      }
+  
+      /*
+       *   * Don't show links for images, or javascript/internal links
+       *     */
+  
+  .ir a:after,
+  a[href^="javascript:"]:after,
+  a[href^="#"]:after {
+      content: "";
+  }
+  
+  pre,
+  blockquote {
+      border: 1px solid #999;
+      page-break-inside: avoid;
+  }
+  
+  thead {
+      display: table-header-group; /* h5bp.com/t */
+  }
+  
+  tr,
+  img {
+      page-break-inside: avoid;
+  }
+  
+  img {
+      max-width: 100% !important;
+  }
+  
+  @page {
+      margin: 0.5cm;
+  }
+  
+  p,
+  h2,
+  h3 {
+      orphans: 3;
+      widows: 3;
+  }
+  
+  h2,
+  h3 {
+      page-break-after: avoid;
+  }
+  }
+
+---
+file: htdocs-explorer/static/css/normalize.css
+template: |
+  /*! normalize.css v1.1.3 | MIT License | git.io/normalize */
+  
+  /* ==========================================================================
+     HTML5 display definitions
+     ========================================================================== */
+  
+  /**
+   * Correct `block` display not defined in IE 6/7/8/9 and Firefox 3.
+   */
+  
+  article,
+  aside,
+  details,
+  figcaption,
+  figure,
+  footer,
+  header,
+  hgroup,
+  main,
+  nav,
+  section,
+  summary {
+      display: block;
+  }
+  
+  /**
+   * Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
+   */
+  
+  audio,
+  canvas,
+  video {
+      display: inline-block;
+      *display: inline;
+      *zoom: 1;
+  }
+  
+  /**
+   * Prevent modern browsers from displaying `audio` without controls.
+   * Remove excess height in iOS 5 devices.
+   */
+  
+  audio:not([controls]) {
+      display: none;
+      height: 0;
+  }
+  
+  /**
+   * Address styling not present in IE 7/8/9, Firefox 3, and Safari 4.
+   * Known issue: no IE 6 support.
+   */
+  
+  [hidden] {
+      display: none;
+  }
+  
+  /* ==========================================================================
+     Base
+     ========================================================================== */
+  
+  /**
+   * 1. Correct text resizing oddly in IE 6/7 when body `font-size` is set using
+   *    `em` units.
+   * 2. Prevent iOS text size adjust after orientation change, without disabling
+   *    user zoom.
+   */
+  
+  html {
+      font-size: 100%; /* 1 */
+      -ms-text-size-adjust: 100%; /* 2 */
+      -webkit-text-size-adjust: 100%; /* 2 */
+  }
+  
+  /**
+   * Address `font-family` inconsistency between `textarea` and other form
+   * elements.
+   */
+  
+  html,
+  button,
+  input,
+  select,
+  textarea {
+      font-family: sans-serif;
+  }
+  
+  /**
+   * Address margins handled incorrectly in IE 6/7.
+   */
+  
+  body {
+      margin: 0;
+  }
+  
+  /* ==========================================================================
+     Links
+     ========================================================================== */
+  
+  /**
+   * Address `outline` inconsistency between Chrome and other browsers.
+   */
+  
+  a:focus {
+      outline: thin dotted;
+  }
+  
+  /**
+   * Improve readability when focused and also mouse hovered in all browsers.
+   */
+  
+  a:active,
+  a:hover {
+      outline: 0;
+  }
+  
+  /* ==========================================================================
+     Typography
+     ========================================================================== */
+  
+  /**
+   * Address font sizes and margins set differently in IE 6/7.
+   * Address font sizes within `section` and `article` in Firefox 4+, Safari 5,
+   * and Chrome.
+   */
+  
+  h1 {
+      font-size: 2em;
+      margin: 0.67em 0;
+  }
+  
+  h2 {
+      font-size: 1.5em;
+      margin: 0.83em 0;
+  }
+  
+  h3 {
+      font-size: 1.17em;
+      margin: 1em 0;
+  }
+  
+  h4 {
+      font-size: 1em;
+      margin: 1.33em 0;
+  }
+  
+  h5 {
+      font-size: 0.83em;
+      margin: 1.67em 0;
+  }
+  
+  h6 {
+      font-size: 0.67em;
+      margin: 2.33em 0;
+  }
+  
+  /**
+   * Address styling not present in IE 7/8/9, Safari 5, and Chrome.
+   */
+  
+  abbr[title] {
+      border-bottom: 1px dotted;
+  }
+  
+  /**
+   * Address style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
+   */
+  
+  b,
+  strong {
+      font-weight: bold;
+  }
+  
+  blockquote {
+      margin: 1em 40px;
+  }
+  
+  /**
+   * Address styling not present in Safari 5 and Chrome.
+   */
+  
+  dfn {
+      font-style: italic;
+  }
+  
+  /**
+   * Address differences between Firefox and other browsers.
+   * Known issue: no IE 6/7 normalization.
+   */
+  
+  hr {
+      -moz-box-sizing: content-box;
+      box-sizing: content-box;
+      height: 0;
+  }
+  
+  /**
+   * Address styling not present in IE 6/7/8/9.
+   */
+  
+  mark {
+      background: #ff0;
+      color: #000;
+  }
+  
+  /**
+   * Address margins set differently in IE 6/7.
+   */
+  
+  p,
+  pre {
+      margin: 1em 0;
+  }
+  
+  /**
+   * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
+   */
+  
+  code,
+  kbd,
+  pre,
+  samp {
+      font-family: monospace, serif;
+      _font-family: 'courier new', monospace;
+      font-size: 1em;
+  }
+  
+  /**
+   * Improve readability of pre-formatted text in all browsers.
+   */
+  
+  pre {
+      white-space: pre;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+  }
+  
+  /**
+   * Address CSS quotes not supported in IE 6/7.
+   */
+  
+  q {
+      quotes: none;
+  }
+  
+  /**
+   * Address `quotes` property not supported in Safari 4.
+   */
+  
+  q:before,
+  q:after {
+      content: '';
+      content: none;
+  }
+  
+  /**
+   * Address inconsistent and variable font size in all browsers.
+   */
+  
+  small {
+      font-size: 80%;
+  }
+  
+  /**
+   * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+   */
+  
+  sub,
+  sup {
+      font-size: 75%;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+  }
+  
+  sup {
+      top: -0.5em;
+  }
+  
+  sub {
+      bottom: -0.25em;
+  }
+  
+  /* ==========================================================================
+     Lists
+     ========================================================================== */
+  
+  /**
+   * Address margins set differently in IE 6/7.
+   */
+  
+  dl,
+  menu,
+  ol,
+  ul {
+      margin: 1em 0;
+  }
+  
+  dd {
+      margin: 0 0 0 40px;
+  }
+  
+  /**
+   * Address paddings set differently in IE 6/7.
+   */
+  
+  menu,
+  ol,
+  ul {
+      padding: 0 0 0 40px;
+  }
+  
+  /**
+   * Correct list images handled incorrectly in IE 7.
+   */
+  
+  nav ul,
+  nav ol {
+      list-style: none;
+      list-style-image: none;
+  }
+  
+  /* ==========================================================================
+     Embedded content
+     ========================================================================== */
+  
+  /**
+   * 1. Remove border when inside `a` element in IE 6/7/8/9 and Firefox 3.
+   * 2. Improve image quality when scaled in IE 7.
+   */
+  
+  img {
+      border: 0; /* 1 */
+      -ms-interpolation-mode: bicubic; /* 2 */
+  }
+  
+  /**
+   * Correct overflow displayed oddly in IE 9.
+   */
+  
+  svg:not(:root) {
+      overflow: hidden;
+  }
+  
+  /* ==========================================================================
+     Figures
+     ========================================================================== */
+  
+  /**
+   * Address margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
+   */
+  
+  figure {
+      margin: 0;
+  }
+  
+  /* ==========================================================================
+     Forms
+     ========================================================================== */
+  
+  /**
+   * Correct margin displayed oddly in IE 6/7.
+   */
+  
+  form {
+      margin: 0;
+  }
+  
+  /**
+   * Define consistent border, margin, and padding.
+   */
+  
+  fieldset {
+      border: 1px solid #c0c0c0;
+      margin: 0 2px;
+      padding: 0.35em 0.625em 0.75em;
+  }
+  
+  /**
+   * 1. Correct color not being inherited in IE 6/7/8/9.
+   * 2. Correct text not wrapping in Firefox 3.
+   * 3. Correct alignment displayed oddly in IE 6/7.
+   */
+  
+  legend {
+      border: 0; /* 1 */
+      padding: 0;
+      white-space: normal; /* 2 */
+      *margin-left: -7px; /* 3 */
+  }
+  
+  /**
+   * 1. Correct font size not being inherited in all browsers.
+   * 2. Address margins set differently in IE 6/7, Firefox 3+, Safari 5,
+   *    and Chrome.
+   * 3. Improve appearance and consistency in all browsers.
+   */
+  
+  button,
+  input,
+  select,
+  textarea {
+      font-size: 100%; /* 1 */
+      margin: 0; /* 2 */
+      vertical-align: baseline; /* 3 */
+      *vertical-align: middle; /* 3 */
+  }
+  
+  /**
+   * Address Firefox 3+ setting `line-height` on `input` using `!important` in
+   * the UA stylesheet.
+   */
+  
+  button,
+  input {
+      line-height: normal;
+  }
+  
+  /**
+   * Address inconsistent `text-transform` inheritance for `button` and `select`.
+   * All other form control elements do not inherit `text-transform` values.
+   * Correct `button` style inheritance in Chrome, Safari 5+, and IE 6+.
+   * Correct `select` style inheritance in Firefox 4+ and Opera.
+   */
+  
+  button,
+  select {
+      text-transform: none;
+  }
+  
+  /**
+   * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+   *    and `video` controls.
+   * 2. Correct inability to style clickable `input` types in iOS.
+   * 3. Improve usability and consistency of cursor style between image-type
+   *    `input` and others.
+   * 4. Remove inner spacing in IE 7 without affecting normal text inputs.
+   *    Known issue: inner spacing remains in IE 6.
+   */
+  
+  button,
+  html input[type="button"], /* 1 */
+  input[type="reset"],
+  input[type="submit"] {
+      -webkit-appearance: button; /* 2 */
+      cursor: pointer; /* 3 */
+      *overflow: visible;  /* 4 */
+  }
+  
+  /**
+   * Re-set default cursor for disabled elements.
+   */
+  
+  button[disabled],
+  html input[disabled] {
+      cursor: default;
+  }
+  
+  /**
+   * 1. Address box sizing set to content-box in IE 8/9.
+   * 2. Remove excess padding in IE 8/9.
+   * 3. Remove excess padding in IE 7.
+   *    Known issue: excess padding remains in IE 6.
+   */
+  
+  input[type="checkbox"],
+  input[type="radio"] {
+      box-sizing: border-box; /* 1 */
+      padding: 0; /* 2 */
+      *height: 13px; /* 3 */
+      *width: 13px; /* 3 */
+  }
+  
+  /**
+   * 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome.
+   * 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome
+   *    (include `-moz` to future-proof).
+   */
+  
+  input[type="search"] {
+      -webkit-appearance: textfield; /* 1 */
+      -moz-box-sizing: content-box;
+      -webkit-box-sizing: content-box; /* 2 */
+      box-sizing: content-box;
+  }
+  
+  /**
+   * Remove inner padding and search cancel button in Safari 5 and Chrome
+   * on OS X.
+   */
+  
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-decoration {
+      -webkit-appearance: none;
+  }
+  
+  /**
+   * Remove inner padding and border in Firefox 3+.
+   */
+  
+  button::-moz-focus-inner,
+  input::-moz-focus-inner {
+      border: 0;
+      padding: 0;
+  }
+  
+  /**
+   * 1. Remove default vertical scrollbar in IE 6/7/8/9.
+   * 2. Improve readability and alignment in all browsers.
+   */
+  
+  textarea {
+      overflow: auto; /* 1 */
+      vertical-align: top; /* 2 */
+  }
+  
+  /* ==========================================================================
+     Tables
+     ========================================================================== */
+  
+  /**
+   * Remove most spacing between table cells.
+   */
+  
+  table {
+      border-collapse: collapse;
+      border-spacing: 0;
+  }
+---
+file: htdocs-explorer/static/common/js/jquery.ze.js
+template: |
+  jQuery.fn.extend({
+      template : function(data){
+          var tmpl_data = $(this).html();
+  
+          var fn = new Function("obj",
+              "var p=[];" +
+  
+              "with(obj){p.push('" +
+              tmpl_data 
+              .replace(/[\r\t\n]/g, " ")
+              .split("<%").join("\t")
+              .replace(/(^|%>)[^\t]*?(\t|$)/g, function(){return arguments[0].split("'").join("\\'");})
+              .replace(/\t==(.*?)%>/g,"',$1,'")
+              .replace(/\t=(.*?)%>/g, "',(($1)+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;'),'")
+              .split("\t").join("');")
+              .split("%>").join("p.push('")
+              + "');}return p.join('');");
+          return fn( data );
+  
+      }
+  
+  });
+  
+  if (window.console && window.console.log ) {
+      window.log = window.console.log
+  } else {
+      window.console = {
+          log: function () {}
+      }
+  }
+---
+file: htdocs-explorer/static/common/js/jquery.cookie.js
+template: |
+  /**
+   *  * jQuery Cookie plugin
+   *   *
+   *    * Copyright (c) 2010 Klaus Hartl (stilbuero.de)
+   *     * Dual licensed under the MIT and GPL licenses:
+   *      * http://www.opensource.org/licenses/mit-license.php
+   *       * http://www.gnu.org/licenses/gpl.html
+   *        *
+   *         */
+  jQuery.cookie = function (key, value, options) {
+      if (arguments.length > 1 && String(value) !== "[object Object]") {
+          options = jQuery.extend({}, options);
+  
+          if (value === null || value === undefined) {
+              options.expires = -1;
+          }
+  
+          if (typeof options.expires === 'number') {
+              var days = options.expires, t = options.expires = new Date();
+              t.setDate(t.getDate() + days);
+          }
+  
+          value = String(value);
+  
+          return (document.cookie = [
+                  encodeURIComponent(key), '=',
+                  options.raw ? value : encodeURIComponent(value),
+                  options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+                  options.path ? '; path=' + options.path : '',
+                  options.domain ? '; domain=' + options.domain : '',
+                  options.secure ? '; secure' : ''
+                  ].join(''));
+      }
+  
+      options = value || {};
+      var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
+      return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
+  };
+---
 file: view-op/index.tx
 template: |
   [% INCLUDE 'header.inc' WITH header = { menu => 'top', sub_menu => 'top' } %]
@@ -629,6 +2027,25 @@ template: |
   }
   
   1;
+---
+file: lib/____var-dist-var____/Explorer.pm
+template: |
+  package <+ dist +>::Explorer;
+  use Ze::Class;
+  extends 'Ze::WAF';
+  use POSIX::AtFork;
+  use <+ dist +>X::Config;
+  
+  if( <+ dist +>X::Config->instance->get('debug') ) {
+      with 'Ze::WAF::Profiler';
+  };
+  
+  sub BUILD {
+      # For true random. once execute srand() per fork child.
+      POSIX::AtFork->add_to_child(sub { srand() });
+  }
+      
+  EOC;
 ---
 file: lib/____var-dist-var____/Validator.pm
 template: |
@@ -3520,6 +4937,124 @@ template: |
   
   1;
 ---
+file: lib/____var-dist-var____/Explorer/Dispatcher.pm
+template: |
+  package <+ dist +>::Explorer::Dispatcher;
+  use Ze::Class;
+  extends 'Ze::WAF::Dispatcher::Router';
+  use <+ dist +>X::Home;
+  
+  sub _build_config_file {
+      my $self = shift;
+      $self->home->file('router/explorer.pl');
+  }
+  
+  sub _build_home {
+      my $self = shift;
+      return <+ dist +>X::Home->get;
+  }
+  
+  EOC;
+---
+file: lib/____var-dist-var____/Explorer/View.pm
+template: |
+  package <+ dist +>::Explorer::View;
+  use Ze::Class;
+  extends "Ze::WAF::View";
+  use Ze::View;
+  
+  
+  sub _build_engine {
+      my $self = shift;
+      my $path = [
+          <+ dist +>X::Home->get()->subdir('view-explorer'),
+          <+ dist +>X::Home->get()->subdir('view-include/explorer')
+      ];
+      return Ze::View->new(
+          engines => [
+              { 
+                engine => 'Ze::View::Xslate', 
+                config  => {
+                  path => $path
+                } 
+              }, 
+              { 
+                engine => 'Ze::View::JSON', 
+              }
+          ]
+      );
+  }
+  
+  
+  EOC;
+---
+file: lib/____var-dist-var____/Explorer/Context.pm
+template: |
+  package <+ dist +>::Explorer::Context;
+  use Ze::Class;
+  extends '<+ dist +>::WAF::Context';
+  
+  
+  __PACKAGE__->load_plugins(qw(
+      Ze::WAF::Plugin::Encode
+      Ze::WAF::Plugin::FillInForm
+      Ze::WAF::Plugin::JSON
+      ));
+  
+  
+  EOC;
+---
+file: lib/____var-dist-var____/Explorer/Controller/Root.pm
+template: |
+  package <+ dist +>::Explorer::Controller::Root;
+  use Ze::Class;
+  extends '<+ dist +>::WAF::Controller';
+  
+  use <+ dist +>X::Config;
+  use <+ dist +>X::Util;
+  use <+ dist +>X::Home;
+  use <+ dist +>::Data::AuthAccessToken;
+  use Furl;
+  use <+ dist +>X::Doc::API;
+  
+  sub index {
+    my ($self,$c)  = @_;
+    my $doc = <+ dist +>X::Doc::API->new();
+    $c->stash->{doc} = $doc->get_list;
+  }
+  
+  sub proxy {
+    my ($self,$c) = @_; 
+  
+    my $furl = Furl->new();
+    my $config = <+ dist +>X::Config->instance();
+    my $url = $config->get('url')->{api} .   $c->req->param('path');
+  
+  
+    my $data = <+ dist +>X::Util::from_json($c->req->param('args') || '{}');
+  
+    my $res = $furl->post(
+       $url,  
+       [ 
+           'X-ACCESS-TOKEN' => $c->req->param('access_token'),
+           'X-INTERNAL-ACCESS-TOKEN' => $c->req->param('internal_token'),
+  
+       ],
+       $data,
+    );
+    $c->res->body($res->body);
+  }
+  
+  sub doc {
+    my ($self,$c) = @_; 
+    $c->view_type('JSON');
+    my $doc = <+ dist +>X::Doc::API->new();
+    my $item = $doc->get($c->req->as_fdat->{path} || '') || {};
+    $c->set_json_stash({item => $item });
+  }
+  
+  1;
+---
 file: lib/____var-dist-var____/Cache/Session.pm
 template: |
   package <+ dist +>::Cache::Session;
@@ -3917,6 +5452,62 @@ template: |
   use constant SUPPORT_OP_TIMEZONES => ['Asia/Tokyo','Asia/Taipei'];
   
   1;
+---
+file: lib/____var-dist-var____X/Doc/API.pm
+template: |
+  package <+ dist +>X::Doc::API;
+  use strict;
+  use warnings;
+  use Ze::Class;
+  use <+ dist +>X::Home;
+  
+  has 'data' => ( is => 'rw');
+  
+  sub BUILD {
+    my $self = shift;
+    my $home = <+ dist +>X::Home->instance();
+    my $doc = do $home->file('doc/api.pl');
+    $self->data($doc);
+  }
+  
+  sub get {
+    my $self = shift;
+    my $path = shift;
+  
+    for my $g (@{$self->data}){
+        for my $i ( @{$g->{list}} ){
+          return $i if $i->{path} eq $path;
+        }
+    }
+    return ;
+  }
+  
+  sub get_list {
+    my $self = shift;
+    my @groups = ();
+  
+    for my $g (@{$self->data}){
+  
+      my $group  = {
+        name => $g->{name},
+      };
+  
+      my @items = ();
+      for my $i ( @{$g->{list}} ){
+          my $item = {
+            path => $i->{path},
+            description => $i->{description},
+          };
+          push @items,$item;
+      }
+      $group->{items} = \@items;
+      push @groups,$group;
+    }
+  
+    return \@groups;
+  }
+  
+  EOC;
 ---
 dir: etc
 ---
@@ -6336,6 +7927,43 @@ template: "sp name sample\n"
 ---
 file: view-include/component/pc/sample/echo.inc
 template: "pc name sample\n"
+---
+file: view-include/explorer/header.inc
+template: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="robots" content="noindex,nofollow" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="expires" content="Thu, 1 Jan 1970 00:00:00 GMT" />
+  
+  <title>Explorer</title>
+  <link rel="stylesheet" href="/static/css/normalize.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  </head>
+---
+file: view-include/explorer/footer.inc
+template: |2
+  
+  <p class="copyright">©G-MODE Corporation</p>
+  
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+  <script src="[% '/static/common/js/jquery.cookie.js' %]"></script>
+  <script src="[% '/static/common/js/jquery.ze.js' %]"></script>
+  
+  [% footer_content %]
+  
+  </body>
+  </html>
+  </body>
+  </html>
 ---
 dir: inc/.author
 ---
@@ -9374,6 +11002,169 @@ template: |
   };
   
   return $route;
+---
+file: router/explorer.pl
+template: |
+  my $router = router {
+    submapper( '/', { controller => 'Root' } )
+      ->connect( '', { action => 'index' } )
+      ->connect( 'proxy', { action => 'proxy' } )
+      ->connect( 'doc', { action => 'doc' } )
+    ;
+  };
+  
+  return $router;
+---
+file: doc/api.pl
+template: |
+  use utf8;
+  use strict;
+  use warnings; 
+  
+  return +[
+      {
+        name => "Basic",
+        list => 
+        [
+          {
+            description => "get application information such as versions",
+            path => '/app/info',
+            requests => {},
+            response => {},
+            custom_errors => {}
+          }  
+        ],
+      },
+      {
+        name => "Member Basic",
+        list => 
+        [
+        {
+          description => "make member account on system",
+          path => "/app/auth_terminal/register",
+          requests => {
+              member_name => 'member name',
+              language => 'language',
+              timezone  => 'timezone',
+              terminal_type  => 'terminal type',
+              terminal_info => 'terminal info'
+          },
+          response => {
+            'item.member_id' => '',
+            'item.language' => '',
+            'item.terminal_code' => ''
+          },
+          custom_errors => {}
+        },
+        {
+          description => "login and get access_token",
+          path => "/app/auth_terminal/login",
+          requests => {
+            terminal_code => '', 
+          },
+          response => {
+            'item.access_token' => 'access token', 
+          },
+          custom_errors => {
+            login_fail => 'throw when login fail',
+          }
+        },
+        {
+          description => "get member current basic info",
+          path => "/app/member/me",
+          requests => {},
+          response => {
+              "item.member_id" => "member id",
+          }, 
+          custom_errors => {}
+        },
+      ]
+    },
+  ];
+---
+file: psgi/explorer.psgi
+template: |+
+  use strict;
+  use FindBin::libs;
+  use Plack::Builder;
+  use File::RotateLogs;
+  use <+ dist +>::Explorer;
+  use <+ dist +>X::Home;
+  use <+ dist +>::Validator;
+  use <+ dist +>X::Config;
+  #use Devel::KYTProf;
+  
+  # singletonize Validator 
+  <+ dist +>::Validator->instance();
+  
+  my $home = <+ dist +>X::Home->get;
+  
+  my $webapp = <+ dist +>::Explorer->new;
+  
+  my $app = $webapp->to_app;
+  
+  my $config = <+ dist +>X::Config->instance();
+  my $middlewares = $config->get('middleware') || {};
+  
+  if ($middlewares) {
+      $middlewares = $middlewares->{explorer} || [];
+  }
+  
+  builder {
+    enable 'Plack::Middleware::Static',
+        path => qr{^/static/},
+        root => $home->file('htdocs-explorer');
+  
+    enable_if { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' } "Plack::Middleware::ReverseProxy";
+  
+    if ( $ENV{<+ dist | upper +>_ENV} eq 'production' ) {
+      my $rotatelogs = File::RotateLogs->new(
+        logfile      => '/var/log/<+ dist | lower +>-explorer/access_log.%Y%m%d%H%M',
+        linkname     => '/var/log/<+ dist | lower +>-explorer/access_log',
+        rotationtime => 3600,
+        maxage       => 86400 * 7,
+      );
+  
+      enable 'Plack::Middleware::AxsLog',
+          combined      => 1,
+          response_time => 1,
+          logger        => sub { $rotatelogs->print(@_) };
+    }
+  
+    for (@$middlewares) {
+      if ( $_->{opts} ) {
+        enable $_->{name}, %{ $_->{opts} };
+      }
+      else {
+        enable $_->{name};
+      }
+    }
+  
+    $app;
+  };
+
+---
+file: psgi/mix.psgi
+template: |
+  use strict;
+  use warnings;
+  use FindBin::libs;
+  use Plack::App::URLMap;
+  use Plack::Util;
+  
+  use <+ dist +>X::Home;
+  
+  my $home = <+ dist +>X::Home->get;
+  
+  my $api = Plack::Util::load_psgi( $home->file('psgi/api.psgi'));
+  my $explorer = Plack::Util::load_psgi( $home->file('psgi/explorer.psgi'));
+  
+  my $urlmap = Plack::App::URLMap->new;
+  $urlmap->map("/" => $explorer); # XXX
+  $urlmap->map("/api" => $api);
+  $urlmap->map("/explorer" => $explorer);
+  
+  $urlmap->to_app;
 ---
 file: psgi/api.psgi
 template: |

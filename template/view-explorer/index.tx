@@ -1,0 +1,157 @@
+[% INCLUDE 'header.inc' %]
+
+
+<table>
+<tr>
+<td valign="top">
+<form method="post" id="form" onsubmit="return do_exproler();">
+  <table class="form">
+    <tr>
+      <th>Access Token:</th>
+      <td><input type="text" name="access_token" id="access_token" value="" /></td>
+    </tr>
+    <tr>
+      <th>Internal Token:</th>
+      <td><input type="text" name="internal_token" id="internal_token" value="" /></td>
+    </tr>
+    <tr>
+      <th>Path</th>
+      <td>
+        <input type="text" name="path" value="/app/info" id="path" />
+      </td>
+    </tr>
+    <tr>
+      <th>Args in JSON</th>
+      <td>
+        <textarea name="args" id="args"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align:right">
+        <input type="submit" value="実行" />
+      </td>
+    </tr>
+
+</table>
+</form>
+
+<table class="form">
+  <tr><td><textarea id="response" name="response" style="width:500px;height:400px"></textarea></td></tr>
+</table>
+
+</td>
+<td valign="top">
+
+<div class="m_info-container" style="width:400px;">
+<div id="doc_detail"></div>
+
+
+<ul>
+[% FOREACH group IN doc %]
+<li>[% group.name %]</li>
+<ul>
+  [% FOREACH item IN group.items %]
+    <li>
+    <a class="api_path" data-api_path="[% item.path %]" href="#">[% item.path %]</a>
+</li>
+  [% END %]
+</ul>
+[% END %]
+</ul>
+
+</div>
+
+</td>
+</tr>
+</table>
+
+
+
+
+[% MACRO footer_content_block  BLOCK -%]
+<script>
+
+set_api('/app/info');
+function set_api(path){
+    $('#path').val( path );
+
+    $.ajax({ 
+      url: '/explorer/doc',
+      data: { path :path},
+      success: function(json){
+        $('#doc_detail').html(  $('#tmpl_doc_detail').template(json.item) );
+        var args = {};
+        for (var field in json.item.requests){
+          args[field] = '';
+        }
+        $('#args').val(JSON.stringify(args, undefined, 2));
+      }
+    });
+
+}
+$(document).ready(function() {
+  $('.api_path').click(function(){
+    var path = $(this).attr('data-api_path');
+    set_api(path);
+  });
+
+  return false;
+
+});
+
+function do_exproler(){
+  $('#response').val('Loading...');
+
+
+
+  $.ajax({ 
+    url: '/explorer/proxy',
+    dataType: "JSON",
+    data: $('#form').serialize(),
+    success: function(json){
+      $('#response').val(JSON.stringify(json, undefined, 2) );
+    }
+  });
+  return false;
+}
+
+</script>
+[% END %]
+
+<script id="tmpl_doc_detail" type="text/html">
+  <table>
+    <tr>
+      <th>path</th>
+      <td><%= path %></td>
+    </tr>
+    <tr>
+      <th>description</th>
+      <td><%= description %></td>
+    </tr>
+    <tr><th colspan="2">Requests</td></tr>
+    <%  for (var field in requests) { %>
+    <tr>
+      <th><%= field %></th>
+      <td><%= requests[field] %></td>
+    </tr>
+    <% } %>
+    <tr><th colspan="2">Response</td></tr>
+    <%  for (var field in response) { %>
+    <tr>
+      <th><%= field %></th>
+      <td><%= response[field] %></td>
+    </tr>
+    <% } %>
+    <tr><th colspan="2">Custom Errors</td></tr>
+    <%  for (var field in custom_errors ) { %>
+    <tr>
+      <th><%= field %></th>
+      <td><%= custom_errors[field] %></td>
+    </tr>
+    <% } %>
+  </table>
+</script>
+
+[% INCLUDE 'footer.inc' WITH
+    footer_content = footer_content_block()
+%]
