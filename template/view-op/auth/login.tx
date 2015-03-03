@@ -3,7 +3,7 @@
 
 <h3>LOGIN</h3>
 
-<form method="post" action="/auth/login">
+<form method="post" action="[% c.uri_for('/auth/login') %]">
 <table class="form">
 <tr>
   <th>Email</th>

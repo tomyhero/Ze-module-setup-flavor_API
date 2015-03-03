@@ -32,5 +32,21 @@ sub NOT_FOUND {
   $c->abort();
 }
 
+sub redirect {
+    my( $c, $url, $code ) = @_;
+    $code ||= 302;
+    $c->res->status( $code );
+    $url = ($url =~ m{^https?://}) ? $url : $c->uri_for( $url );
+    $c->res->redirect( $url );
+    $c->finished(1);
+ }
+
+ sub uri_for {
+    my $c = shift;
+    my $path = shift;
+    my $config = <+ dist +>X::Config->instance();
+    my $url = $config->get('url')->{op} . $path;
+    return $url;
+}
 
 EOC;

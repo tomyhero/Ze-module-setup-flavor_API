@@ -30,14 +30,14 @@
   [% UNLESS i.3 == 0 or operator_obj.has_privilege(i.3) %]
     [% NEXT %]
   [% END %]
-  <li>[% IF i.0 == header.menu %]<b>[% i.1 %]</b>[% ELSE %]<a class="menu-[% i.0 %]" href="[% i.2 %]">[% i.1 %]</a>[% END %]</li>
+  <li>[% IF i.0 == header.menu %]<b>[% i.1 %]</b>[% ELSE %]<a class="menu-[% i.0 %]" href="[% c.uri_for(i.2) %]">[% i.1 %]</a>[% END %]</li>
 [% END %]
 </ul>
 
 [% SET sub_menus = SUB_MENU.${header.menu} %]
 <ul id="sub_menu">
 [% FOREACH i IN sub_menus %]
- <li>[% IF i.0 == header.sub_menu %]<b>[% i.1 %]</b>[% ELSE %]<a class="menu-[% i.0 %]" href="[% i.2 %]">[% i.1 %]</a>[% END %]</li>
+ <li>[% IF i.0 == header.sub_menu %]<b>[% i.1 %]</b>[% ELSE %]<a class="menu-[% i.0 %]" href="[% c.uri_for(i.2) %]">[% i.1 %]</a>[% END %]</li>
 [% END %]
 </ul>
 </div>

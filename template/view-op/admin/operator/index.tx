@@ -1,6 +1,6 @@
 [% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operator_list' } %]
 
-<form method="get" action="/admin/operator/">
+<form method="get" action="[% c.uri_for('/admin/operator/') %]">
 <table class="search">
 <tr>
 <th>operator id</th>
@@ -59,9 +59,9 @@
   </td>
   <td>[% obj.on_active %]
   <td>
-  <a href="/admin/operator/[% obj.id %]/">detail</a>/
-  <a href="/admin/operator/[% obj.id %]/edit">edit</a>/
-  <a href="/admin/operation_log/?operator_id=[% obj.id %]">oprator log</a>
+  <a href="[% c.uri_for('/admin/operator/' _  obj.id _ '/') %]">detail</a>/
+  <a href="[% c.uri_for('/admin/operator/' _  obj.id _ '/edit') %]">edit</a>/
+  <a href="[% c.uri_for('/admin/operation_log/?operator_id=' _ obj.id ) %]">oprator log</a>
 </td>
 </tr>
 [% END %]

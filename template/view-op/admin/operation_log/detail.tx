@@ -7,7 +7,7 @@
     </tr>
     <tr>
       <th>operator</th>
-       <td><a href="/admin/operator/[% obj.operator_id %]/">[% obj.operator_id %]</a> : [% obj.operator_obj.op_name %]</td>
+       <td><a href="[% c.uri_for('/admin/operator/' _ obj.operator_id _ '/') %]">[% obj.operator_id %]</a> : [% obj.operator_obj.op_name %]</td>
     </tr>
     <tr>
       [% SET lookup_operation_type = lookup_const('operation_type') %]

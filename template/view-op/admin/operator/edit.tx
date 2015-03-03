@@ -4,7 +4,7 @@
 operator > edit
 </div>
 
-<form method="post" action="/admin/operator/[% obj.id %]/edit">
+<form method="post" action="[% c.uri_for('/admin/operator/' _  obj.id + '/edit') %]">
 [% INCLUDE 'admin/operator/form.inc' WITH mode = 'edit' %]
 </form>
 

@@ -27,7 +27,7 @@ if ($middlewares) {
 builder {
   enable 'Plack::Middleware::Static',
       path => qr{^/static/},
-      root => $home->file('htdocs-explorer');
+      root => $home->file('htdocs-internal');
 
   enable_if { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' } "Plack::Middleware::ReverseProxy";
 

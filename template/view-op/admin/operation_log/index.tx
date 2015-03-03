@@ -1,6 +1,6 @@
 [% INCLUDE 'header.inc' WITH header = { menu => 'admin', sub_menu => 'operation_log_list' } %]
 
-<form method="get" action="/admin/operation_log/">
+<form method="get" action="[% c.uri_for('/admin/operation_log/') %]">
 <table class="search">
 
 
@@ -54,10 +54,10 @@
 [% FOREACH obj IN objs %]
 <tr>
   <td>[% obj.id %]</td>
-  <td> <a href="/admin/operator/[% obj.operator_id %]/">[% obj.operator_id %]</a> : [% obj.operator_obj.op_name %]</td>
+  <td> <a href="[% c.uri_for('/admin/operator/' _ obj.operator_id _ '/') %]">[% obj.operator_id %]</a> : [% obj.operator_obj.op_name %]</td>
   <td>[% obj.operation_type %] : [% lookup_operation_type.${obj.operation_type} %]</td>
   <td>[% obj.attributes_dump %]</td>
-  <td><a href="/admin/operation_log/[% obj.id %]/">detail</a></td>
+  <td><a href="[% c.uri_for('/admin/operation_log/' _  obj.id _ '/') %]">detail</a></td>
 </tr>
 [% END %]
 </table>

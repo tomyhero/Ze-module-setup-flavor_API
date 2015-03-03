@@ -1,7 +1,7 @@
 [% INCLUDE 'header.inc' WITH header = { menu => 'my', sub_menu => 'operator_edit' } %]
 
 
-<form method="post" action="/my/operator/edit">
+<form method="post" action="[% c.uri_for('/my/operator/edit') %]">
 <table class="form">
     <tr>
       <th>Email</th>

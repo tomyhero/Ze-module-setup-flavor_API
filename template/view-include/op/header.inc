@@ -19,7 +19,7 @@
 [% IF operator_obj %]
 <div class="login-bar">
 <b>[% operator_obj.op_name %]</b> : <small>[% operator_obj.op_timezone %] - [% requested_at.set_time_zone(operator_obj.op_timezone).fmt_datetime() %]</small>
-<a href="/auth/logout">logout</a>
+<a href="[% c.uri_for('/auth/logout') %]">logout</a>
 </div>
 [% INCLUDE 'menu.inc' %]
 [% END %]
