@@ -5,6 +5,7 @@ all_from 'lib/<+ dist +>.pm';
 requires (
   "Ze" => 0.04,
   "Aplon" => 0,
+  "DBD::mysql" => 0,
   "Devel::KYTProf" => 0,
   "Proc::Guard" => 0,
   "HTTP::Session" => 0,
