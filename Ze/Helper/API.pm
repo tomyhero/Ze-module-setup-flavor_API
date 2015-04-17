@@ -79,6 +79,7 @@ template: |
     "Digest::SHA" => 0,
     "Data::LazyACL" => 0,
     "Locale::Maketext::Lexicon" => 0,
+    "Furl" => 0,
   );
   
   test_requires(
@@ -6585,7 +6586,7 @@ template: |
       $('#path').val( path );
   
       $.ajax({ 
-        url: '/explorer/doc',
+        url: '[% c.config.get('explorer').api %]/doc',
         data: { path :path},
         success: function(json){
           $('#doc_detail').html(  $('#tmpl_doc_detail').template(json.item) );
@@ -6614,7 +6615,7 @@ template: |
   
   
     $.ajax({ 
-      url: '/explorer/proxy',
+      url: '[% c.config.get('explorer').api %]/proxy',
       dataType: "JSON",
       data: $('#form').serialize(),
       success: function(json){

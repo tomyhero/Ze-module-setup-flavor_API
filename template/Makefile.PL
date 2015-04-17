@@ -26,6 +26,7 @@ requires (
   "Digest::SHA" => 0,
   "Data::LazyACL" => 0,
   "Locale::Maketext::Lexicon" => 0,
+  "Furl" => 0,
 );
 
 test_requires(
